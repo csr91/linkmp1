@@ -28,7 +28,7 @@ def linkmp(payload):
         return {'error': 'No se encontró un token para este org_vta'}, 400
 
     sdk = mercadopago.SDK(access_token)
-    title = str(payload.get("reference")) if payload.get("reference") else "Producto sin nombre"
+    title = str(payload.get("reference")) if payload.get("reference") else "Producto. sin nombre"
     
     try:
         total_amount = float(payload.get("totalAmount")) if payload.get("totalAmount") else 0.0
