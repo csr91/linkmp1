@@ -8,8 +8,8 @@ app.config['SECRET_KEY'] = 'clave123'  # Cambia esto por una clave segura
 
 # Simulación de almacenamiento de client_id y client_secret
 clients = {
-    'tu_client_id': {
-        'client_secret': 'clavecliente123'
+    'linkdesap': {
+        'client_secret': 'clavesap123'
     }
 }
 
