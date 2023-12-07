@@ -1,26 +1,27 @@
 import os
 import mercadopago
 from flask import Flask, request, jsonify
+from itsdangerous import URLSafeTimedSerializer as Serializer
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'clave123'  # Cambia esto por una clave segura
 
-token_buar_1c = os.environ.get('MERCADO_PAGO_BUAR_1C')
-token_buar_3c = os.environ.get('MERCADO_PAGO_BUAR_3C')
-token_zjar_1c = os.environ.get('MERCADO_PAGO_ZJAR_1C')
-token_zjar_3c = os.environ.get('MERCADO_PAGO_ZJAR_3C')
-token_bucl_1c = os.environ.get('MERCADO_PAGO_BUCL_1C')
-token_bupe_1c = os.environ.get('MERCADO_PAGO_BUPE_1C')
-token_bumx_1c = os.environ.get('MERCADO_PAGO_BUMX_1C')
-
-tokens_mapping = {
-    "1000": token_buar_1c,
-    "1020": token_zjar_1c,
-    "3000": token_bumx_1c,
-    "4000": token_bucl_1c,
-    "6000": token_bupe_1c
+# Simulación de almacenamiento de client_id y client_secret
+clients = {
+    'tu_client_id': {
+        'client_secret': 'clavecliente123'
+    }
 }
 
-def linkmp(payload):
+tokens_mapping = {
+    "1000": os.environ.get('MERCADO_PAGO_BUAR_1C'),
+    "1020": os.environ.get('MERCADO_PAGO_ZJAR_1C'),
+    "3000": os.environ.get('MERCADO_PAGO_BUMX_1C'),
+    "4000": os.environ.get('MERCADO_PAGO_BUCL_1C'),
+    "6000": os.environ.get('MERCADO_PAGO_BUPE_1C')
+}
+
+def linkmp(payload, access_token):
     org_vta = payload.get("org_vta")
     access_token = tokens_mapping.get(org_vta)
 
@@ -29,7 +30,7 @@ def linkmp(payload):
 
     sdk = mercadopago.SDK(access_token)
     title = str(payload.get("reference")) if payload.get("reference") else "Producto. sin nombre"
-    
+
     try:
         total_amount = float(payload.get("totalAmount")) if payload.get("totalAmount") else 0.0
     except ValueError:
@@ -55,20 +56,105 @@ def linkmp(payload):
     else:
         return {'error': 'La respuesta no contiene el ID de preferencia', 'enlace_de_pago': payment_link}, 500
 
+import os
+import mercadopago
+from flask import Flask, request, jsonify
+from itsdangerous import URLSafeTimedSerializer as Serializer
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'clave123'  # Cambia esto por una clave segura
+
+# Simulación de almacenamiento de client_id y client_secret
+clients = {
+    'tu_client_id': {
+        'client_secret': 'clavecliente123'
+    }
+}
+
+tokens_mapping = {
+    "1000": os.environ.get('MERCADO_PAGO_BUAR_1C'),
+    "1020": os.environ.get('MERCADO_PAGO_ZJAR_1C'),
+    "3000": os.environ.get('MERCADO_PAGO_BUMX_1C'),
+    "4000": os.environ.get('MERCADO_PAGO_BUCL_1C'),
+    "6000": os.environ.get('MERCADO_PAGO_BUPE_1C')
+}
+
+def linkmp(payload, access_token):
+    org_vta = payload.get("org_vta")
+    access_token = tokens_mapping.get(org_vta)
+
+    if access_token is None:
+        return {'error': 'No se encontró un token para este org_vta'}, 400
+
+    sdk = mercadopago.SDK(access_token)
+    title = str(payload.get("reference")) if payload.get("reference") else "Producto. sin nombre"
+
+    try:
+        total_amount = float(payload.get("totalAmount")) if payload.get("totalAmount") else 0.0
+    except ValueError:
+        return {'error': 'El monto no es válido'}, 400
+
+    preference_data = {
+        "items": [
+            {
+                "title": title,
+                "quantity": 1,
+                "unit_price": total_amount,
+            }
+        ]
+    }
+
+    preference_response = sdk.preference().create(preference_data)
+    
+    payment_link = preference_response['response'].get('init_point', '')
+
+    if 'response' in preference_response and 'id' in preference_response['response']:
+        preference_id = preference_response['response']['id']
+        return {'preference_id': preference_id, 'enlace_de_pago': payment_link}
+    else:
+        return {'error': 'La respuesta no contiene el ID de preferencia', 'enlace_de_pago': payment_link}, 500
+
+@app.route('/login', methods=['GET'])
+def login():
+    grant_type = request.args.get('grant_type')
+    client_id = request.args.get('client_id')
+    client_secret = request.args.get('client_secret')
+
+    if grant_type != 'client_credentials':
+        return jsonify({'error': 'El tipo de concesión debe ser client_credentials'}), 400
+
+    if client_id not in clients or clients[client_id]['client_secret'] != client_secret:
+        return jsonify({'error': 'Credenciales inválidas'}), 401
+
+    s = Serializer(app.config['SECRET_KEY'])
+    access_token = s.dumps({'client_id': client_id})
+    print(f"Access Token: {access_token}")  # Imprimir el token generado
+    return jsonify({'access_token': access_token})
+
+
 @app.route('/generar_link', methods=['POST'])
 def generar_link():
-    payload = request.get_json()
+    # print(request.method)
+    print(request.headers)
+    # print(request.get_data())
+    access_token = request.headers.get('Authorization')
 
-    if payload is None or 'org_vta' not in payload:
-        return jsonify({'error': 'No se proporcionó un JSON válido o falta org_vta'}), 400
+    if access_token is None or not access_token.startswith('Bearer '):
+        return jsonify({'error': 'Token de autorización no válido'}), 401
 
-    # Convertir org_vta, totalAmount y reference a texto
-    payload['org_vta'] = str(payload['org_vta'])
-    payload['totalAmount'] = str(payload.get('totalAmount', ''))
-    payload['reference'] = str(payload.get('reference', ''))
+    access_token = access_token.split('Bearer ')[1]  # Obtener el token
 
-    payment_data = linkmp(payload)
-    return jsonify(payment_data)
+    s = Serializer(app.config['SECRET_KEY'])
+    try:
+        s.loads(access_token)
+        payload = request.get_json()
+        if payload is None or 'org_vta' not in payload:
+            return jsonify({'error': 'No se proporcionó un JSON válido o falta org_vta'}), 400
+
+        payment_data = linkmp(payload, access_token)
+        return jsonify(payment_data)
+    except:
+        return jsonify({'error': 'Token inválido'}), 401
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
