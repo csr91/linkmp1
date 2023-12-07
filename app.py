@@ -8,66 +8,8 @@ app.config['SECRET_KEY'] = 'clave123'  # Cambia esto por una clave segura
 
 # Simulación de almacenamiento de client_id y client_secret
 clients = {
-    'linkdesap': {
+    'usuariosap': {
         'client_secret': 'clavesap123'
-    }
-}
-
-tokens_mapping = {
-    "1000": os.environ.get('MERCADO_PAGO_BUAR_1C'),
-    "1020": os.environ.get('MERCADO_PAGO_ZJAR_1C'),
-    "3000": os.environ.get('MERCADO_PAGO_BUMX_1C'),
-    "4000": os.environ.get('MERCADO_PAGO_BUCL_1C'),
-    "6000": os.environ.get('MERCADO_PAGO_BUPE_1C')
-}
-
-def linkmp(payload, access_token):
-    org_vta = payload.get("org_vta")
-    access_token = tokens_mapping.get(org_vta)
-
-    if access_token is None:
-        return {'error': 'No se encontró un token para este org_vta'}, 400
-
-    sdk = mercadopago.SDK(access_token)
-    title = str(payload.get("reference")) if payload.get("reference") else "Producto. sin nombre"
-
-    try:
-        total_amount = float(payload.get("totalAmount")) if payload.get("totalAmount") else 0.0
-    except ValueError:
-        return {'error': 'El monto no es válido'}, 400
-
-    preference_data = {
-        "items": [
-            {
-                "title": title,
-                "quantity": 1,
-                "unit_price": total_amount,
-            }
-        ]
-    }
-
-    preference_response = sdk.preference().create(preference_data)
-    
-    payment_link = preference_response['response'].get('init_point', '')
-
-    if 'response' in preference_response and 'id' in preference_response['response']:
-        preference_id = preference_response['response']['id']
-        return {'preference_id': preference_id, 'enlace_de_pago': payment_link}
-    else:
-        return {'error': 'La respuesta no contiene el ID de preferencia', 'enlace_de_pago': payment_link}, 500
-
-import os
-import mercadopago
-from flask import Flask, request, jsonify
-from itsdangerous import URLSafeTimedSerializer as Serializer
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'clave123'  # Cambia esto por una clave segura
-
-# Simulación de almacenamiento de client_id y client_secret
-clients = {
-    'tu_client_id': {
-        'client_secret': 'clavecliente123'
     }
 }
 
