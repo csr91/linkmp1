@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-token_buar_1c = os.environ.get('MERCADO_PAGO_TEST_1C')
+token_buar_1c = os.environ.get('MERCADO_PAGO_BUAR_1C')
 token_buar_3c = os.environ.get('MERCADO_PAGO_BUAR_3C')
 token_zjar_1c = os.environ.get('MERCADO_PAGO_ZJAR_1C')
 token_zjar_3c = os.environ.get('MERCADO_PAGO_ZJAR_3C')
