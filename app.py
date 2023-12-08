@@ -102,7 +102,7 @@ def generar_link():
         if payload is None or 'org_vta' not in payload:
             return jsonify({'error': 'No se proporcionó un JSON válido o falta org_vta'}), 400
 
-        webhook_url = "http://127.0.0.1:5000/webhook"  # Reemplaza con la URL de tu webhook
+        webhook_url = "https://linkmp1.vercel.app/webhook"  # Reemplaza con la URL de tu webhook
         payment_data = linkmp(payload, access_token, webhook_url)
         return jsonify(payment_data)
     except:
