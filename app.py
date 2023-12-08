@@ -56,6 +56,10 @@ def linkmp(payload, access_token):
     else:
         return {'error': 'La respuesta no contiene el ID de preferencia', 'enlace_de_pago': payment_link}, 500
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/login', methods=['GET'])
 def login():
     grant_type = request.args.get('grant_type')
