@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_from_directory, session, url_for
+import requests
 import os
 import mercadopago
 from flask import Flask, request, jsonify
@@ -144,13 +145,43 @@ def wh6000():
             # Imprimir el cuerpo del webhook en la terminal
             print("Webhook Data:")
             print(data)
-            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+            
+            # Obtener el ID del pago de la notificación
+            payment_id = data.get('data', {}).get('id')
 
-            return jsonify({'status': 'ok'}), 200
+            if payment_id:
+                # Realizar la solicitud GET a la API de MercadoPago para obtener información detallada
+                api_url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
+                headers = {
+                    'Authorization': f'Bearer {os.environ.get('MERCADO_PAGO_BUPE_1C')}'
+                }
+                response = requests.get(api_url, headers=headers)
+
+                if response.status_code == 200:
+                    payment_info = response.json()
+
+                    # Obtener la información necesaria
+                    external_reference = payment_info.get('external_reference', '')
+                    status = payment_info.get('status', '')
+                    status_detail = payment_info.get('status_detail', '')
+
+                    if status == 'approved' and status_detail == 'accredited':
+                        print(f"El ID {external_reference} fue aprobado y acreditado.")
+                    elif status == 'rejected' and status_detail == 'cc_rejected_bad_filled_security_code':
+                        print(f"El ID {external_reference} fue rechazado por código de seguridad incorrecto.")
+                    else:
+                        print(f"El ID {external_reference} tiene estado {status} y detalle {status_detail}.")
+                    
+                    return jsonify({'status': 'ok'}), 200
+                else:
+                    print(f"No se pudo obtener la información del pago. Código de estado: {response.status_code}")
+                    return jsonify({'error': 'No se pudo obtener la información del pago'}), 500
+            else:
+                return jsonify({'error': 'ID de pago no proporcionado en la notificación'}), 400
         else:
             return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 500    
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/wh4000', methods=['POST'])
 def wh4000():
@@ -161,13 +192,43 @@ def wh4000():
             # Imprimir el cuerpo del webhook en la terminal
             print("Webhook Data:")
             print(data)
-            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+            
+            # Obtener el ID del pago de la notificación
+            payment_id = data.get('data', {}).get('id')
 
-            return jsonify({'status': 'ok'}), 200
+            if payment_id:
+                # Realizar la solicitud GET a la API de MercadoPago para obtener información detallada
+                api_url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
+                headers = {
+                    'Authorization': f'Bearer {os.environ.get('MERCADO_PAGO_BUCL_1C')}'
+                }
+                response = requests.get(api_url, headers=headers)
+
+                if response.status_code == 200:
+                    payment_info = response.json()
+
+                    # Obtener la información necesaria
+                    external_reference = payment_info.get('external_reference', '')
+                    status = payment_info.get('status', '')
+                    status_detail = payment_info.get('status_detail', '')
+
+                    if status == 'approved' and status_detail == 'accredited':
+                        print(f"El ID {external_reference} fue aprobado y acreditado.")
+                    elif status == 'rejected' and status_detail == 'cc_rejected_bad_filled_security_code':
+                        print(f"El ID {external_reference} fue rechazado por código de seguridad incorrecto.")
+                    else:
+                        print(f"El ID {external_reference} tiene estado {status} y detalle {status_detail}.")
+                    
+                    return jsonify({'status': 'ok'}), 200
+                else:
+                    print(f"No se pudo obtener la información del pago. Código de estado: {response.status_code}")
+                    return jsonify({'error': 'No se pudo obtener la información del pago'}), 500
+            else:
+                return jsonify({'error': 'ID de pago no proporcionado en la notificación'}), 400
         else:
             return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 500    
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/wh1020', methods=['POST'])
 def wh1020():
@@ -178,13 +239,43 @@ def wh1020():
             # Imprimir el cuerpo del webhook en la terminal
             print("Webhook Data:")
             print(data)
-            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+            
+            # Obtener el ID del pago de la notificación
+            payment_id = data.get('data', {}).get('id')
 
-            return jsonify({'status': 'ok'}), 200
+            if payment_id:
+                # Realizar la solicitud GET a la API de MercadoPago para obtener información detallada
+                api_url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
+                headers = {
+                    'Authorization': f'Bearer {os.environ.get('MERCADO_PAGO_ZJAR_1C')}'
+                }
+                response = requests.get(api_url, headers=headers)
+
+                if response.status_code == 200:
+                    payment_info = response.json()
+
+                    # Obtener la información necesaria
+                    external_reference = payment_info.get('external_reference', '')
+                    status = payment_info.get('status', '')
+                    status_detail = payment_info.get('status_detail', '')
+
+                    if status == 'approved' and status_detail == 'accredited':
+                        print(f"El ID {external_reference} fue aprobado y acreditado.")
+                    elif status == 'rejected' and status_detail == 'cc_rejected_bad_filled_security_code':
+                        print(f"El ID {external_reference} fue rechazado por código de seguridad incorrecto.")
+                    else:
+                        print(f"El ID {external_reference} tiene estado {status} y detalle {status_detail}.")
+                    
+                    return jsonify({'status': 'ok'}), 200
+                else:
+                    print(f"No se pudo obtener la información del pago. Código de estado: {response.status_code}")
+                    return jsonify({'error': 'No se pudo obtener la información del pago'}), 500
+            else:
+                return jsonify({'error': 'ID de pago no proporcionado en la notificación'}), 400
         else:
             return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 500    
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/wh1000', methods=['POST'])
 def wh1000():
@@ -195,13 +286,43 @@ def wh1000():
             # Imprimir el cuerpo del webhook en la terminal
             print("Webhook Data:")
             print(data)
-            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+            
+            # Obtener el ID del pago de la notificación
+            payment_id = data.get('data', {}).get('id')
 
-            return jsonify({'status': 'ok'}), 200
+            if payment_id:
+                # Realizar la solicitud GET a la API de MercadoPago para obtener información detallada
+                api_url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
+                headers = {
+                    'Authorization': f'Bearer {os.environ.get('MERCADO_PAGO_BUAR_1C')}'
+                }
+                response = requests.get(api_url, headers=headers)
+
+                if response.status_code == 200:
+                    payment_info = response.json()
+
+                    # Obtener la información necesaria
+                    external_reference = payment_info.get('external_reference', '')
+                    status = payment_info.get('status', '')
+                    status_detail = payment_info.get('status_detail', '')
+
+                    if status == 'approved' and status_detail == 'accredited':
+                        print(f"El ID {external_reference} fue aprobado y acreditado.")
+                    elif status == 'rejected' and status_detail == 'cc_rejected_bad_filled_security_code':
+                        print(f"El ID {external_reference} fue rechazado por código de seguridad incorrecto.")
+                    else:
+                        print(f"El ID {external_reference} tiene estado {status} y detalle {status_detail}.")
+                    
+                    return jsonify({'status': 'ok'}), 200
+                else:
+                    print(f"No se pudo obtener la información del pago. Código de estado: {response.status_code}")
+                    return jsonify({'error': 'No se pudo obtener la información del pago'}), 500
+            else:
+                return jsonify({'error': 'ID de pago no proporcionado en la notificación'}), 400
         else:
             return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 500    
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/wh3000', methods=['POST'])
 def wh3000():
@@ -212,13 +333,43 @@ def wh3000():
             # Imprimir el cuerpo del webhook en la terminal
             print("Webhook Data:")
             print(data)
-            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+            
+            # Obtener el ID del pago de la notificación
+            payment_id = data.get('data', {}).get('id')
 
-            return jsonify({'status': 'ok'}), 200
+            if payment_id:
+                # Realizar la solicitud GET a la API de MercadoPago para obtener información detallada
+                api_url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
+                headers = {
+                    'Authorization': f'Bearer {os.environ.get('MERCADO_PAGO_BUMX_1C')}'
+                }
+                response = requests.get(api_url, headers=headers)
+
+                if response.status_code == 200:
+                    payment_info = response.json()
+
+                    # Obtener la información necesaria
+                    external_reference = payment_info.get('external_reference', '')
+                    status = payment_info.get('status', '')
+                    status_detail = payment_info.get('status_detail', '')
+
+                    if status == 'approved' and status_detail == 'accredited':
+                        print(f"El ID {external_reference} fue aprobado y acreditado.")
+                    elif status == 'rejected' and status_detail == 'cc_rejected_bad_filled_security_code':
+                        print(f"El ID {external_reference} fue rechazado por código de seguridad incorrecto.")
+                    else:
+                        print(f"El ID {external_reference} tiene estado {status} y detalle {status_detail}.")
+                    
+                    return jsonify({'status': 'ok'}), 200
+                else:
+                    print(f"No se pudo obtener la información del pago. Código de estado: {response.status_code}")
+                    return jsonify({'error': 'No se pudo obtener la información del pago'}), 500
+            else:
+                return jsonify({'error': 'ID de pago no proporcionado en la notificación'}), 400
         else:
             return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 500    
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
