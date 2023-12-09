@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, send_from_directory, session
+from flask import Flask, render_template, jsonify, request, redirect, url_for, send_from_directory, session, url_for
 import os
 import mercadopago
 from flask import Flask, request, jsonify
@@ -37,6 +37,10 @@ def linkmp(payload, access_token, webhook_url):
     except ValueError:
         return {'error': 'El monto no es válido'}, 400
 
+    # Construir external_reference concatenando org_vta y uniqueid
+    uniqueid = str(payload.get("uniqueid")) if payload.get("uniqueid") else ""
+    external_reference = f"{org_vta}-{uniqueid}" if uniqueid else ""
+
     preference_data = {
         "items": [
             {
@@ -45,7 +49,8 @@ def linkmp(payload, access_token, webhook_url):
                 "unit_price": total_amount,
             }
         ],
-        "notification_url": webhook_url  # Agregar la URL del webhook aquí
+        "notification_url": webhook_url,
+        "external_reference": external_reference
     }
 
     preference_response = sdk.preference().create(preference_data)
@@ -99,18 +104,107 @@ def generar_link():
     try:
         s.loads(access_token)
         payload = request.get_json()
-        if payload is None or 'org_vta' not in payload:
+        if payload is None or 'org_vta' not in payload: 
             return jsonify({'error': 'No se proporcionó un JSON válido o falta org_vta'}), 400
 
-        webhook_url = "https://linkmp1.vercel.app/webhook"  # Reemplaza con la URL de tu webhook
+        # Obtener el webhook_url dependiendo de org_vta
+        org_vta = payload.get("org_vta")
+        webhook_url = get_webhook_url(org_vta)
+
+        if webhook_url is None:
+            return jsonify({'error': 'No se encontró un webhook para este org_vta'}), 400
+
+        # Enviar el webhook correspondiente
         payment_data = linkmp(payload, access_token, webhook_url)
         return jsonify(payment_data)
     except:
         return jsonify({'error': 'Token inválido'}), 401
 
-    
-@app.route('/webhook', methods=['POST'])
-def webhook():
+def get_webhook_url(org_vta):
+    # Definir aquí la lógica para obtener el webhook_url según org_vta
+    if org_vta == "1000":
+        return url_for('wh1000', _external=True)
+    elif org_vta == "1020":
+        return url_for('wh1020', _external=True)
+    elif org_vta == "3000":
+        return url_for('wh3000', _external=True)
+    elif org_vta == "4000":
+        return url_for('wh4000', _external=True)
+    elif org_vta == "6000":
+        return url_for('wh6000', _external=True)
+    else:
+        return None
+
+@app.route('/wh6000', methods=['POST'])
+def wh6000():
+    try:
+        # Verificar si la solicitud tiene un cuerpo JSON
+        if request.is_json:
+            data = request.json
+            # Imprimir el cuerpo del webhook en la terminal
+            print("Webhook Data:")
+            print(data)
+            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+
+            return jsonify({'status': 'ok'}), 200
+        else:
+            return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500    
+
+@app.route('/wh4000', methods=['POST'])
+def wh4000():
+    try:
+        # Verificar si la solicitud tiene un cuerpo JSON
+        if request.is_json:
+            data = request.json
+            # Imprimir el cuerpo del webhook en la terminal
+            print("Webhook Data:")
+            print(data)
+            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+
+            return jsonify({'status': 'ok'}), 200
+        else:
+            return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500    
+
+@app.route('/wh1020', methods=['POST'])
+def wh1020():
+    try:
+        # Verificar si la solicitud tiene un cuerpo JSON
+        if request.is_json:
+            data = request.json
+            # Imprimir el cuerpo del webhook en la terminal
+            print("Webhook Data:")
+            print(data)
+            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+
+            return jsonify({'status': 'ok'}), 200
+        else:
+            return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500    
+
+@app.route('/wh1000', methods=['POST'])
+def wh1000():
+    try:
+        # Verificar si la solicitud tiene un cuerpo JSON
+        if request.is_json:
+            data = request.json
+            # Imprimir el cuerpo del webhook en la terminal
+            print("Webhook Data:")
+            print(data)
+            # Aquí puedes agregar la lógica para procesar los datos del webhook según tus necesidades
+
+            return jsonify({'status': 'ok'}), 200
+        else:
+            return jsonify({'error': 'La solicitud no contiene datos JSON'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500    
+
+@app.route('/wh3000', methods=['POST'])
+def wh3000():
     try:
         # Verificar si la solicitud tiene un cuerpo JSON
         if request.is_json:
