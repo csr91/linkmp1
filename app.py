@@ -29,7 +29,7 @@ def linkmp(payload, access_token, webhook_url):
     print(access_token)
 
     if access_token is None:
-        return {'error': 'No se encontró un token para este org_vtaa'}, 400
+        return {'error': 'No se encontró un token para este org_vta'}, 400
 
     sdk = mercadopago.SDK(access_token)
     title = str(payload.get("reference")) if payload.get("reference") else "Producto. sin nombre"
