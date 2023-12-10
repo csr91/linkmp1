@@ -247,7 +247,7 @@ def wh1020():
                 # Realizar la solicitud GET a la API de MercadoPago para obtener información detallada
                 api_url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
                 headers = {
-                    'Authorization': f'Bearer {os.environ.get('MERCADO_PAGO_ZJAR_1C')}'
+                    'Authorization': f'Bearer {os.environ.get("MERCADO_PAGO_ZJAR_1C")}'
                 }
                 response = requests.get(api_url, headers=headers)
 
