@@ -26,9 +26,10 @@ tokens_mapping = {
 def linkmp(payload, access_token, webhook_url):
     org_vta = payload.get("org_vta")
     access_token = tokens_mapping.get(org_vta)
+    print(access_token)
 
     if access_token is None:
-        return {'error': 'No se encontró un token para este org_vta'}, 400
+        return {'error': 'No se encontró un token para este org_vtaa'}, 400
 
     sdk = mercadopago.SDK(access_token)
     title = str(payload.get("reference")) if payload.get("reference") else "Producto. sin nombre"
@@ -126,7 +127,7 @@ def get_webhook_url(org_vta):
     if org_vta == "1000":
         return url_for('wh1000', _external=True)
     elif org_vta == "1020":
-        return url_for('wh1020', _external=True)
+        return "https://linkmp1.vercel.app/wh1020"
     elif org_vta == "3000":
         return url_for('wh3000', _external=True)
     elif org_vta == "4000":
