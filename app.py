@@ -10,8 +10,8 @@ app.config['SECRET_KEY'] = 'clave123'  # Cambia esto por una clave segura
 
 # Simulación de almacenamiento de client_id y client_secret
 clients = {
-    'usuariosap': {
-        'client_secret': 'clavesap123'
+    os.environ.get('CLIENT_ID_USUARIOSAP', 'default_client_id'): {
+        'client_secret': os.environ.get('CLIENT_SECRET_USUARIOSAP', 'default_client_secret')
     }
 }
 
