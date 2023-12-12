@@ -74,11 +74,12 @@ def linkmp(payload, access_token, webhook_url):
 def index():
     return render_template('index.html')
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['POST'])
 def login():
-    grant_type = request.args.get('grant_type')
-    client_id = request.args.get('client_id')
-    client_secret = request.args.get('client_secret')
+    data = request.get_json()  # Obtener los datos del cuerpo de la solicitud en formato JSON
+    grant_type = data.get('grant_type')
+    client_id = data.get('client_id')
+    client_secret = data.get('client_secret')
 
     if grant_type != 'client_credentials':
         return jsonify({'error': 'El tipo de concesión debe ser client_credentials'}), 400
@@ -90,8 +91,6 @@ def login():
     access_token = s.dumps({'client_id': client_id})
     print(f"Access Token: {access_token}")  # Imprimir el token generado
     return jsonify({'access_token': access_token})
-
-
 
 @app.route('/generar_link', methods=['POST'])
 def generar_link():
