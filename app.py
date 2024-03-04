@@ -363,7 +363,7 @@ def wh3000():
                     return jsonify({'status': 'ok'}), 200
                 else:
                     print(f"No se pudo obtener la información del pago. Código de estado: {response.status_code}")
-                    return jsonify({'error': 'No se pudo obtener la información del pago'}), 500
+                    return jsonify({'error': 'No se pudo obtener la información del pagoo'}), 500
             else:
                 return jsonify({'error': 'ID de pago no proporcionado en la notificación'}), 400
         else:
